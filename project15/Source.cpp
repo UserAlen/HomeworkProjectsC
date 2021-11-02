@@ -1,4 +1,4 @@
-#include <iostream>
+ï»¿#include <iostream>
 using namespace std;
 int main() {
 	setlocale(0, "");
@@ -78,20 +78,20 @@ int main() {
 
 	arr1[0][0] = 1;
 
-	cout << "[+] Ëàáèðèíò\n\n";
+	cout << "[+] Ð›Ð°Ð±Ð¸Ñ€Ð¸Ð½Ñ‚\n\n";
 	cout << "[1] 15x15\n";
 	cout << "[2] 20x20\n";
 	cout << "[3] 30x30\n";
 
-	cout << "\n[+] Âûáåðèòå îäèí èç ëàáèðèíòîâ: ";
+	cout << "\n[+] Ð’Ñ‹Ð±ÐµÑ€Ð¸Ñ‚Ðµ Ð¾Ð´Ð¸Ð½ Ð¸Ð· Ð»Ð°Ð±Ð¸Ñ€Ð¸Ð½Ñ‚Ð¾Ð²: ";
 	short menu;
 	cin >> menu;
 
 	switch (menu) {
 	case 1: {//15x15
 		system("cls");
-		cout << "[+] Âû âûáðàëè ëàáèðèíò \"15x15\"\n\n";
-		//âûâîä 15õ15
+		cout << "[+] Ð’Ñ‹ Ð²Ñ‹Ð±Ñ€Ð°Ð»Ð¸ Ð»Ð°Ð±Ð¸Ñ€Ð¸Ð½Ñ‚ \"15x15\"\n\n";
+		//Ð²Ñ‹Ð²Ð¾Ð´ 15Ñ…15
 		for (int y = 0; y < sizeof(arr1) / sizeof(arr1[0]); y++) {
 			for (int x = 0; x < (sizeof(arr1) / sizeof(int)) / (sizeof(arr1) / sizeof(arr1[0])); x++) {
 				if (arr1[y][x] == 0) {
@@ -108,9 +108,9 @@ int main() {
 	}
 	case 2: {//20x20
 		system("cls");
-		cout << "[+] Âû âûáðàëè ëàáèðèíò \"20x20\"\n\n";
+		cout << "[+] Ð’Ñ‹ Ð²Ñ‹Ð±Ñ€Ð°Ð»Ð¸ Ð»Ð°Ð±Ð¸Ñ€Ð¸Ð½Ñ‚ \"20x20\"\n\n";
 
-		//âûâîä 20õ20
+		//Ð²Ñ‹Ð²Ð¾Ð´ 20Ñ…20
 		for (int y = 0; y < sizeof(arr2) / sizeof(arr2[0]); y++) {
 			for (int x = 0; x < (sizeof(arr2) / sizeof(int)) / (sizeof(arr2) / sizeof(arr2[0])); x++) {
 				if (arr2[y][x] == 0) {
@@ -127,9 +127,9 @@ int main() {
 	}
 	case 3: {//30x30
 		system("cls");
-		cout << "[+] Âû âûáðàëè ëàáèðèíò \"30x30\"\n\n";
+		cout << "[+] Ð’Ñ‹ Ð²Ñ‹Ð±Ñ€Ð°Ð»Ð¸ Ð»Ð°Ð±Ð¸Ñ€Ð¸Ð½Ñ‚ \"30x30\"\n\n";
 
-		//âûâîä 30õ30
+		//Ð²Ñ‹Ð²Ð¾Ð´ 30Ñ…30
 		for (int y = 0; y < sizeof(arr3) / sizeof(arr3[0]); y++) {
 			for (int x = 0; x < (sizeof(arr3) / sizeof(int)) / (sizeof(arr3) / sizeof(arr3[0])); x++) {
 				if (arr3[y][x] == 0) {
@@ -145,7 +145,7 @@ int main() {
 		break;
 	}
 	default:
-		cout << "\n Íåâåðíî ââåäåí ïóíêò";
+		cout << "\n ÐÐµÐ²ÐµÑ€Ð½Ð¾ Ð²Ð²ÐµÐ´ÐµÐ½ Ð¿ÑƒÐ½ÐºÑ‚";
 		break;
 	}
 
