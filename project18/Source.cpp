@@ -36,11 +36,6 @@ int main() {
 	while (menu != 4) {
 		getMenu();
 		cin >> menu;
-		while (menu < 1 || menu > 4) {
-			getMessageError();
-			getMenu();
-			cin >> menu;
-		}
 		switch (menu) {
 		case 1:
 			break;
@@ -48,11 +43,6 @@ int main() {
 			getSettingsMenu();
 			short menuSettings;
 			cin >> menuSettings;
-			while (menuSettings < 1 || menuSettings > 3) {
-				getMessageError();
-				getSettingsMenu();
-				cin >> menuSettings;
-			}
 			switch (menuSettings) {
 			case 1:
 				break;
