@@ -22,12 +22,16 @@ void getSettingsMenu(short colorX, short colorO) {
 	cout << "3. Размер поля\n";
 	cout << "\nВведите нужный пункт: ";
 }
-void getErrorMessage() {
-	cout << "\n[ОШИБКА] Что-то пошло не так. . .\n\nЕсли произошло зацикливание - ALT+F4\n\n";
+void getReturningMessage() {
+	cout << endl;
 	for (int i = 3; i > 0; i--) {
 		cout << "\rВозврат через " << i << ". . .";
 		Sleep(1000);
 	}
+}
+void getErrorMessage() {
+	cout << "\n[ОШИБКА] Что-то пошло не так. . .\n\nЕсли произошло зацикливание - ALT+F4\n\n";
+	getReturningMessage();
 }
 void getStartGameMenu() {
 	clearConsole();
@@ -44,7 +48,7 @@ void showArray(short array[], const short SIZE, short colorX, short colorO) {
 	short i = 0;
 	short iSize3x3 = 3;
 	short iSize4x4 = 4;
-	short iSize5x5 = 4;
+	short iSize5x5 = 5;
 	for (short y = 0; y < SIZE + 1; y++) {
 		if ( // 
 			(SIZE == 3 * 3 && (y == 3 || y == 3 * 2 || y == 3 * 3))
@@ -112,23 +116,88 @@ string getSoloGameMessage(short array[], const short SIZE, short inputPlayer, sh
 			return "Тест\n";
 		}
 		else {
-			cin >> placeInput; //пользователь вводит куда ставить arrayInput
-			switch (placeInput) {
-			case 1:
-			case 2:
-			case 3:
-			case 4:
-			case 5:
-			case 6:
-			case 7:
-			case 8:
-			case 9:
-				array[placeInput - 1] = inputPlayer;
-				roundPlayer++;
-				break;
-			default:
-				getErrorMessage();
-				break;
+			if (SIZE == 3 * 3) {
+				cin >> placeInput; //пользователь вводит куда ставить arrayInput
+				switch (placeInput) {
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+				case 5:
+				case 6:
+				case 7:
+				case 8:
+				case 9:
+					array[placeInput - 1] = inputPlayer;
+					roundPlayer++;
+					break;
+				default:
+					getErrorMessage();
+					break;
+				}
+			}
+			else if (SIZE == 4 * 4) {
+				cin >> placeInput; //пользователь вводит куда ставить arrayInput
+				switch (placeInput) {
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+				case 5:
+				case 6:
+				case 7:
+				case 8:
+				case 9:
+				case 10:
+				case 11:
+				case 12:
+				case 13:
+				case 14:
+				case 15:
+				case 16:
+					array[placeInput - 1] = inputPlayer;
+					roundPlayer++;
+					break;
+				default:
+					getErrorMessage();
+					break;
+				}
+			}
+			else if (SIZE == 5 * 5) {
+				cin >> placeInput; //пользователь вводит куда ставить arrayInput
+				switch (placeInput) {
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+				case 5:
+				case 6:
+				case 7:
+				case 8:
+				case 9:
+				case 10:
+				case 11:
+				case 12:
+				case 13:
+				case 14:
+				case 15:
+				case 16:
+				case 17:
+				case 18:
+				case 19:
+				case 20:
+				case 21:
+				case 22:
+				case 23:
+				case 24:
+				case 25:
+					array[placeInput - 1] = inputPlayer;
+					roundPlayer++;
+					break;
+				default:
+					getErrorMessage();
+					break;
+				}
 			}
 		}
 	}
@@ -182,6 +251,10 @@ void clearArray(short array[], short SIZE) {//функция очистки ма
 		array[i] = 0;
 	}
 }
+void getFieldSizeMenu() {
+	clearConsole();
+	cout << "Выбор размера поля:\n1. 3x3\n2. 4x4\n3. 5x5\n\n";
+}
 int main() {
 	setlocale(0, "");
 
@@ -210,13 +283,13 @@ int main() {
 	};
 
 	//-- для настроек
-	short inputPlayer1 = 2;
-	short inputPlayer2 = 1;
+	short inputPlayer1 = 2; //по умолчанию игрок1 ходит крестиком
+	short inputPlayer2 = 1; //по умолчанию игрок2 ходит ноликом
 
-	short arraySizeInput = 1;
+	short fieldSizeInput = 1; //по умолчанию выбрано поле 3х3
 
-	short colorO = 0;
-	short colorX = 0;
+	short colorO = 0; //по умолчанию нолик без цвета (стандартный)
+	short colorX = 0; //по умолчанию крестик без цвета (стандартный)
 	//== для настроек
 	short menu = 0;
 	while (menu != 4) {
@@ -231,9 +304,26 @@ int main() {
 			cin >> menuStartGame;
 			switch (menuStartGame) {
 			case 1: //Одиночная
-				cout << getSoloGameMessage(array3x3, SIZE3x3, inputPlayer1, colorX, colorO);//в разработке
-				cout << endl << "Введите любую цифру для возврата в меню. . ." << endl;
-				clearArray(array3x3, SIZE3x3);
+				switch (fieldSizeInput) {
+				case 1:
+					cout << getSoloGameMessage(array3x3, SIZE3x3, inputPlayer1, colorX, colorO);//в разработке
+					cout << endl << "Введите любую цифру для возврата в меню. . ." << endl;
+					clearArray(array3x3, SIZE3x3);
+					break;
+				case 2:
+					cout << getSoloGameMessage(array4x4, SIZE4x4, inputPlayer1, colorX, colorO);//в разработке
+					cout << endl << "Введите любую цифру для возврата в меню. . ." << endl;
+					clearArray(array4x4, SIZE4x4);
+					break;
+				case 3:
+					cout << getSoloGameMessage(array5x5, SIZE5x5, inputPlayer1, colorX, colorO);//в разработке
+					cout << endl << "Введите любую цифру для возврата в меню. . ." << endl;
+					clearArray(array5x5, SIZE5x5);
+					break;
+				default:
+					getErrorMessage();
+					break;
+				}
 				cin >> _;
 				break;
 			case 2: //Два игрока
@@ -259,6 +349,8 @@ int main() {
 					short colorChoiceX;
 					cin >> colorChoiceX;
 					colorX = getColor(colorChoiceX);
+					cout << "Выбран " << colorChoiceX << " пункт\n";
+					getReturningMessage();
 					break;
 				}
 				case 2: { //цвет нолика
@@ -266,20 +358,33 @@ int main() {
 					short colorChoiceO;
 					cin >> colorChoiceO;
 					colorO = getColor(colorChoiceO);
+					cout << "Выбран " << colorChoiceO << " пункт\n";
+					getReturningMessage();
 					break;
 				}
 				default:
 					getErrorMessage();
 					break;
 				}
-				//в разработке
 				break;
 			}
 			case 2: // кто первый ходит
 				//в разработке
 				break;
 			case 3: // размер поля
-				//в разработке
+				getFieldSizeMenu();
+				cin >> fieldSizeInput;
+				switch (fieldSizeInput) {
+				case 1:
+				case 2:
+				case 3:
+					cout << "Выбран " << fieldSizeInput << " пункт\n";
+					getReturningMessage();
+					break;
+				default:
+					getErrorMessage();
+					break;
+				}
 				break;
 			default:
 				getErrorMessage();
