@@ -14,10 +14,10 @@ void getMenu() {
 	cout << "4. Выйти\n";
 	cout << "\nВведите нужный пункт: ";
 }
-void getSettingsMenu() {
+void getSettingsMenu(short colorX, short colorO) {
 	clearConsole();
 	cout << "Настройки\n";
-	cout << "1. Цвет крестика и нолика\n";
+	cout << "1. Цвет крестика \x1b[" << colorX << "m[X]\x1b[0m и нолика \x1b[" << colorO << "m[O]\x1b[0m\n";
 	cout << "2. Кто первый ходит\n";
 	cout << "3. Размер поля\n";
 	cout << "\nВведите нужный пункт: ";
@@ -37,7 +37,7 @@ void getStartGameMenu() {
 	cout << "\nВведите нужный пункт: ";
 }
 
-void showArray(short array[], const short SIZE) {//доработать 12345 abcde
+void showArray(short array[], const short SIZE, short colorX, short colorO) {
 	//0 - пусто
 	//1 - нолик
 	//2 - крестик
@@ -81,16 +81,16 @@ void showArray(short array[], const short SIZE) {//доработать 12345 ab
 			cout << "# ";
 		}
 		else if (array[y] == 1) {
-			cout << "О ";
+			cout << "\x1b[" << colorO << "mО \x1b[0m";
 		}
 		else if (array[y] == 2) {
-			cout << "X ";
+			cout << "\x1b[" << colorX << "mX \x1b[0m";
 		}
 	}
 	cout << endl << endl;
 }
 
-string getSoloGameMessage(short array[], const short SIZE, short inputPlayer) {//добавить в параметры цвета, arrayInput после настроек
+string getSoloGameMessage(short array[], const short SIZE, short inputPlayer, short colorX, short colorO) {
 	// ДОБАВИТЬ ИНФО КТО ХОДИТ
 	short roundPlayer = 0;
 	short roundBot = 0;
@@ -107,7 +107,7 @@ string getSoloGameMessage(short array[], const short SIZE, short inputPlayer) {/
 	//Если место уже помечено Х или 0, то туда больше нельзя ставить
 	while (roundPlayer + roundBot != SIZE + 1) {
 		clearConsole();
-		showArray(array, SIZE);
+		showArray(array, SIZE, colorX, colorO);
 		if (roundPlayer + roundBot == SIZE) {
 			return "Тест\n";
 		}
@@ -133,6 +133,54 @@ string getSoloGameMessage(short array[], const short SIZE, short inputPlayer) {/
 		}
 	}
 	return "В разработке";
+}
+short getColor(short colorChoice) {
+	switch (colorChoice) {
+	case 1: return 0;
+	case 2: return 90;
+	case 3: return 91;
+	case 4: return 92;
+	case 5: return 93;
+	case 6: return 94;
+	case 7: return 95;
+	case 8: return 96;
+	default: 
+		getErrorMessage();
+		return 0;
+	}
+}
+void getXColorMenu(short colorX){
+	clearConsole();
+	cout << "Выберите цвет для \x1b[" << colorX << "mX\x1b[0m:\n\n";
+	cout << "1. Стандартный [\x1b[0mX\x1b[0m]\n";
+	cout << "2. Серый [\x1b[90mX\x1b[0m]\n";
+	cout << "3. Красный [\x1b[91mX\x1b[0m]\n";
+	cout << "4. Зеленый  [\x1b[92mX\x1b[0m]\n";
+	cout << "5. Желтый  [\x1b[93mX\x1b[0m]\n";
+	cout << "6. Синий  [\x1b[94mX\x1b[0m]\n";
+	cout << "7. Розовый  [\x1b[95mX\x1b[0m]\n";
+	cout << "8. Голубой  [\x1b[96mX\x1b[0m]\n";
+}
+void getOColorMenu(short colorO) {
+	clearConsole();
+	cout << "Выберите цвет для \x1b[" << colorO << "mO\x1b[0m:\n\n";
+	cout << "1. Стандартный [\x1b[0mO\x1b[0m]\n";
+	cout << "2. Серый [\x1b[90mO\x1b[0m]\n";
+	cout << "3. Красный [\x1b[91mO\x1b[0m]\n";
+	cout << "4. Зеленый  [\x1b[92mO\x1b[0m]\n";
+	cout << "5. Желтый  [\x1b[93mO\x1b[0m]\n";
+	cout << "6. Синий  [\x1b[94mO\x1b[0m]\n";
+	cout << "7. Розовый  [\x1b[95mO\x1b[0m]\n";
+	cout << "8. Голубой  [\x1b[96mO\x1b[0m]\n";
+}
+void getColorsMenu(short colorX, short colorO) {
+	clearConsole();
+	cout << "Выберите X или O\n 1. \x1b[" << colorX << "mX\x1b[0m\n 2. \x1b["<< colorO << "mO\x1b[0m\n\n";
+}
+void clearArray(short array[], short SIZE) {//функция очистки массива от прошлой игры
+	for (int i = 0; i < SIZE; i++) {
+		array[i] = 0;
+	}
 }
 int main() {
 	setlocale(0, "");
@@ -161,22 +209,20 @@ int main() {
 		0,0,0,0,0
 	};
 
+	//-- для настроек
+	short inputPlayer1 = 2;
+	short inputPlayer2 = 1;
+
+	short arraySizeInput = 1;
+
+	short colorO = 0;
+	short colorX = 0;
+	//== для настроек
 	short menu = 0;
 	while (menu != 4) {
 		getMenu();
 		cin >> menu;
 		short _; //нужно для того, чтобы сразу не закрывалось какое-либо окно в консоле
-
-		//-- для настроек
-		short inputPlayer1 = 2;
-		short inputPlayer2 = 1;
-		
-		short arraySizeInput = 1;
-
-		short colorO = 1;
-		short colorX = 1;
-		//== для настроек (перекинуть за цикл)
-
 
 		switch (menu) {
 		case 1: // начать игру
@@ -185,8 +231,9 @@ int main() {
 			cin >> menuStartGame;
 			switch (menuStartGame) {
 			case 1: //Одиночная
-				cout << getSoloGameMessage(array3x3, SIZE3x3, inputPlayer1);//в разработке
-				cout << endl << "Введите что-нибудь для возврата в меню. . ." << endl;
+				cout << getSoloGameMessage(array3x3, SIZE3x3, inputPlayer1, colorX, colorO);//в разработке
+				cout << endl << "Введите любую цифру для возврата в меню. . ." << endl;
+				clearArray(array3x3, SIZE3x3);
 				cin >> _;
 				break;
 			case 2: //Два игрока
@@ -198,13 +245,36 @@ int main() {
 			}
 			break;
 		case 2: {//настройки
-			getSettingsMenu();
+			getSettingsMenu(colorX, colorO);
 			short menuSettings;
 			cin >> menuSettings;
 			switch (menuSettings) {
-			case 1: // цвет крестика и нолика
+			case 1: {// цвет крестика и нолика
+				getColorsMenu(colorX, colorO);
+				short choiceXO;
+				cin >> choiceXO;
+				switch (choiceXO) {
+				case 1: { // цвет крестика
+					getXColorMenu(colorX);
+					short colorChoiceX;
+					cin >> colorChoiceX;
+					colorX = getColor(colorChoiceX);
+					break;
+				}
+				case 2: { //цвет нолика
+					getXColorMenu(colorX);
+					short colorChoiceO;
+					cin >> colorChoiceO;
+					colorO = getColor(colorChoiceO);
+					break;
+				}
+				default:
+					getErrorMessage();
+					break;
+				}
 				//в разработке
 				break;
+			}
 			case 2: // кто первый ходит
 				//в разработке
 				break;
