@@ -108,6 +108,12 @@ string getSoloGameMessage(short array[], const short SIZE, short inputPlayer, sh
 	}
 
 	short placeInput = 0;
+	
+	short tempArrayForSavingPlaceInputs[sizeof(array) / sizeof(short)]{};
+	for (short i = 0; i < sizeof(array) / sizeof(short); i++) {
+		tempArrayForSavingPlaceInputs[i] = 0;
+	}
+
 	//Если место уже помечено Х или 0, то туда больше нельзя ставить
 	while (roundPlayer + roundBot != SIZE + 1) {
 		clearConsole();
@@ -116,8 +122,9 @@ string getSoloGameMessage(short array[], const short SIZE, short inputPlayer, sh
 			return "Тест\n";
 		}
 		else {
+			cin >> placeInput; //пользователь вводит куда ставить inputPlayer
+			short tempInput = 0;
 			if (SIZE == 3 * 3) {
-				cin >> placeInput; //пользователь вводит куда ставить arrayInput
 				switch (placeInput) {
 				case 1:
 				case 2:
@@ -127,17 +134,29 @@ string getSoloGameMessage(short array[], const short SIZE, short inputPlayer, sh
 				case 6:
 				case 7:
 				case 8:
-				case 9:
-					array[placeInput - 1] = inputPlayer;
-					roundPlayer++;
+				case 9: { //placeInput почему-то 0 и массивы ломаются (ничего в сетку не ставится), а к round все равно прибавляется +1 (проблемы с placeInput = 7, ставится на место 1)
+					bool inputIsOkay = false;
+					bool inputGotError = false;
+					if (tempArrayForSavingPlaceInputs[placeInput - 1] == 1) {
+						getErrorMessage();
+						inputGotError = true;
+					}
+					else {
+						tempArrayForSavingPlaceInputs[placeInput - 1] = 1;
+						inputIsOkay = true;
+					}
+					if (inputIsOkay == true && inputGotError == false) {
+						array[placeInput - 1] = inputPlayer;
+						roundPlayer++;
+					}
 					break;
+				}
 				default:
 					getErrorMessage();
 					break;
 				}
 			}
 			else if (SIZE == 4 * 4) {
-				cin >> placeInput; //пользователь вводит куда ставить arrayInput
 				switch (placeInput) {
 				case 1:
 				case 2:
@@ -155,6 +174,7 @@ string getSoloGameMessage(short array[], const short SIZE, short inputPlayer, sh
 				case 14:
 				case 15:
 				case 16:
+					//перепис 3х3 но для 4х4
 					array[placeInput - 1] = inputPlayer;
 					roundPlayer++;
 					break;
@@ -164,7 +184,6 @@ string getSoloGameMessage(short array[], const short SIZE, short inputPlayer, sh
 				}
 			}
 			else if (SIZE == 5 * 5) {
-				cin >> placeInput; //пользователь вводит куда ставить arrayInput
 				switch (placeInput) {
 				case 1:
 				case 2:
@@ -191,6 +210,7 @@ string getSoloGameMessage(short array[], const short SIZE, short inputPlayer, sh
 				case 23:
 				case 24:
 				case 25:
+					//перепис
 					array[placeInput - 1] = inputPlayer;
 					roundPlayer++;
 					break;
@@ -213,12 +233,12 @@ short getColor(short colorChoice) {
 	case 6: return 94;
 	case 7: return 95;
 	case 8: return 96;
-	default: 
+	default:
 		getErrorMessage();
 		return 0;
 	}
 }
-void getXColorMenu(short colorX){
+void getXColorMenu(short colorX) {
 	clearConsole();
 	cout << "Выберите цвет для \x1b[" << colorX << "mX\x1b[0m:\n\n";
 	cout << "1. Стандартный [\x1b[0mX\x1b[0m]\n";
@@ -244,7 +264,7 @@ void getOColorMenu(short colorO) {
 }
 void getColorsMenu(short colorX, short colorO) {
 	clearConsole();
-	cout << "Выберите X или O\n 1. \x1b[" << colorX << "mX\x1b[0m\n 2. \x1b["<< colorO << "mO\x1b[0m\n\n";
+	cout << "Выберите X или O\n 1. \x1b[" << colorX << "mX\x1b[0m\n 2. \x1b[" << colorO << "mO\x1b[0m\n\n";
 }
 void clearArray(short array[], short SIZE) {//функция очистки массива от прошлой игры
 	for (int i = 0; i < SIZE; i++) {
