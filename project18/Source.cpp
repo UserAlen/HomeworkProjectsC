@@ -108,10 +108,26 @@ string getSoloGameMessage(short array[], const short SIZE, short inputPlayer, sh
 	}
 
 	short placeInput = 0;
-	
-	short tempArrayForSavingPlaceInputs[sizeof(array) / sizeof(short)]{};
-	for (short i = 0; i < sizeof(array) / sizeof(short); i++) {
-		tempArrayForSavingPlaceInputs[i] = 0;
+
+	const short SIZE_FOR_TEMP_ARRAY3x3 = 3*3;
+
+	short tempArrayForSavingPlaceInputs3x3[SIZE_FOR_TEMP_ARRAY3x3]{};
+	for (short i = 0; i < SIZE_FOR_TEMP_ARRAY3x3; i++) {
+		tempArrayForSavingPlaceInputs3x3[i] = 0;
+	}
+
+	const short SIZE_FOR_TEMP_ARRAY4x4 = 4 * 4;
+
+	short tempArrayForSavingPlaceInputs4x4[SIZE_FOR_TEMP_ARRAY4x4]{};
+	for (short i = 0; i < SIZE_FOR_TEMP_ARRAY4x4; i++) {
+		tempArrayForSavingPlaceInputs4x4[i] = 0;
+	}
+
+	const short SIZE_FOR_TEMP_ARRAY5x5 = 5 * 5;
+
+	short tempArrayForSavingPlaceInputs5x5[SIZE_FOR_TEMP_ARRAY5x5]{};
+	for (short i = 0; i < SIZE_FOR_TEMP_ARRAY5x5; i++) {
+		tempArrayForSavingPlaceInputs5x5[i] = 0;
 	}
 
 	//Если место уже помечено Х или 0, то туда больше нельзя ставить
@@ -124,6 +140,9 @@ string getSoloGameMessage(short array[], const short SIZE, short inputPlayer, sh
 		else {
 			cin >> placeInput; //пользователь вводит куда ставить inputPlayer
 			short tempInput = 0;
+
+			bool inputIsOkay = false;
+			bool inputGotError = false;
 			if (SIZE == 3 * 3) {
 				switch (placeInput) {
 				case 1:
@@ -134,15 +153,13 @@ string getSoloGameMessage(short array[], const short SIZE, short inputPlayer, sh
 				case 6:
 				case 7:
 				case 8:
-				case 9: { //placeInput почему-то 0 и массивы ломаются (ничего в сетку не ставится), а к round все равно прибавляется +1 (проблемы с placeInput = 7, ставится на место 1)
-					bool inputIsOkay = false;
-					bool inputGotError = false;
-					if (tempArrayForSavingPlaceInputs[placeInput - 1] == 1) {
+				case 9: {
+					if (tempArrayForSavingPlaceInputs3x3[placeInput - 1] == 1) {
 						getErrorMessage();
 						inputGotError = true;
 					}
 					else {
-						tempArrayForSavingPlaceInputs[placeInput - 1] = 1;
+						tempArrayForSavingPlaceInputs3x3[placeInput - 1] = 1;
 						inputIsOkay = true;
 					}
 					if (inputIsOkay == true && inputGotError == false) {
@@ -174,9 +191,18 @@ string getSoloGameMessage(short array[], const short SIZE, short inputPlayer, sh
 				case 14:
 				case 15:
 				case 16:
-					//перепис 3х3 но для 4х4
-					array[placeInput - 1] = inputPlayer;
-					roundPlayer++;
+					if (tempArrayForSavingPlaceInputs4x4[placeInput - 1] == 1) {
+						getErrorMessage();
+						inputGotError = true;
+					}
+					else {
+						tempArrayForSavingPlaceInputs4x4[placeInput - 1] = 1;
+						inputIsOkay = true;
+					}
+					if (inputIsOkay == true && inputGotError == false) {
+						array[placeInput - 1] = inputPlayer;
+						roundPlayer++;
+					}
 					break;
 				default:
 					getErrorMessage();
@@ -210,9 +236,18 @@ string getSoloGameMessage(short array[], const short SIZE, short inputPlayer, sh
 				case 23:
 				case 24:
 				case 25:
-					//перепис
-					array[placeInput - 1] = inputPlayer;
-					roundPlayer++;
+					if (tempArrayForSavingPlaceInputs5x5[placeInput - 1] == 1) {
+						getErrorMessage();
+						inputGotError = true;
+					}
+					else {
+						tempArrayForSavingPlaceInputs5x5[placeInput - 1] = 1;
+						inputIsOkay = true;
+					}
+					if (inputIsOkay == true && inputGotError == false) {
+						array[placeInput - 1] = inputPlayer;
+						roundPlayer++;
+					}
 					break;
 				default:
 					getErrorMessage();
