@@ -14,7 +14,7 @@ void getMenu() {
 	cout << "4. Выйти\n";
 	cout << "\nВведите нужный пункт: ";
 }
-void getSettingsMenu(short colorX, short colorO) {
+void getSettingsMenu(short colorX, short colorO, short fieldSize, short firstInput) {
 	clearConsole();
 	cout << "Настройки\n";
 	cout << "1. Цвет крестика \x1b[" << colorX << "m[X]\x1b[0m и нолика \x1b[" << colorO << "m[O]\x1b[0m\n";
@@ -40,7 +40,9 @@ void getStartGameMenu() {
 	cout << "2. Два игрока\n";
 	cout << "\nВведите нужный пункт: ";
 }
-
+void showExitMessage(short number) {
+	cout << "Введите цифру \"" << number << "\" для выхода\n\n";
+}
 void showArray(short array[], const short SIZE, short colorX, short colorO) {
 	//0 - пусто
 	//1 - нолик
@@ -67,12 +69,18 @@ void showArray(short array[], const short SIZE, short colorX, short colorO) {
 			else if (SIZE == 4 * 4) {
 				for (; i < iSize4x4; i++) {
 					cout << i + 1 << " ";
+					if (i < 9) {
+						cout << " ";
+					}
 				}
 				iSize4x4 += 4;
 			}
 			else if (SIZE == 5 * 5) {
 				for (; i < iSize5x5; i++) {
 					cout << i + 1 << " ";
+					if (i < 10) {
+						cout << " ";
+					}
 				}
 				iSize5x5 += 5;
 			}
@@ -109,7 +117,7 @@ string getSoloGameMessage(short array[], const short SIZE, short inputPlayer, sh
 
 	short placeInput = 0;
 
-	const short SIZE_FOR_TEMP_ARRAY3x3 = 3*3;
+	const short SIZE_FOR_TEMP_ARRAY3x3 = 3 * 3;
 
 	short tempArrayForSavingPlaceInputs3x3[SIZE_FOR_TEMP_ARRAY3x3]{};
 	for (short i = 0; i < SIZE_FOR_TEMP_ARRAY3x3; i++) {
@@ -133,12 +141,16 @@ string getSoloGameMessage(short array[], const short SIZE, short inputPlayer, sh
 	//Если место уже помечено Х или 0, то туда больше нельзя ставить
 	while (roundPlayer + roundBot != SIZE + 1) {
 		clearConsole();
+		showExitMessage(99);
 		showArray(array, SIZE, colorX, colorO);
 		if (roundPlayer + roundBot == SIZE) {
 			return "Тест\n";
 		}
 		else {
 			cin >> placeInput; //пользователь вводит куда ставить inputPlayer
+			if (placeInput == 99) {
+				break;
+			}
 			short tempInput = 0;
 
 			bool inputIsOkay = false;
@@ -256,7 +268,7 @@ string getSoloGameMessage(short array[], const short SIZE, short inputPlayer, sh
 			}
 		}
 	}
-	return "В разработке";
+	return "\nИгра закончена\n";
 }
 short getColor(short colorChoice) {
 	switch (colorChoice) {
@@ -306,6 +318,9 @@ void clearArray(short array[], short SIZE) {//функция очистки ма
 		array[i] = 0;
 	}
 }
+void showReturningToMenuMessage() {
+	cout << endl << "Введите любую цифру для возврата в меню. . ." << endl;
+}
 void getFieldSizeMenu() {
 	clearConsole();
 	cout << "Выбор размера поля:\n1. 3x3\n2. 4x4\n3. 5x5\n\n";
@@ -339,9 +354,10 @@ int main() {
 
 	//-- для настроек
 	short inputPlayer1 = 2; //по умолчанию игрок1 ходит крестиком
-	short inputPlayer2 = 1; //по умолчанию игрок2 ходит ноликом
 
 	short fieldSizeInput = 1; //по умолчанию выбрано поле 3х3
+
+	short firstInput = 2;
 
 	short colorO = 0; //по умолчанию нолик без цвета (стандартный)
 	short colorX = 0; //по умолчанию крестик без цвета (стандартный)
@@ -362,17 +378,17 @@ int main() {
 				switch (fieldSizeInput) {
 				case 1:
 					cout << getSoloGameMessage(array3x3, SIZE3x3, inputPlayer1, colorX, colorO);//в разработке
-					cout << endl << "Введите любую цифру для возврата в меню. . ." << endl;
+					showReturningToMenuMessage();
 					clearArray(array3x3, SIZE3x3);
 					break;
 				case 2:
 					cout << getSoloGameMessage(array4x4, SIZE4x4, inputPlayer1, colorX, colorO);//в разработке
-					cout << endl << "Введите любую цифру для возврата в меню. . ." << endl;
+					showReturningToMenuMessage();
 					clearArray(array4x4, SIZE4x4);
 					break;
 				case 3:
 					cout << getSoloGameMessage(array5x5, SIZE5x5, inputPlayer1, colorX, colorO);//в разработке
-					cout << endl << "Введите любую цифру для возврата в меню. . ." << endl;
+					showReturningToMenuMessage();
 					clearArray(array5x5, SIZE5x5);
 					break;
 				default:
@@ -390,7 +406,7 @@ int main() {
 			}
 			break;
 		case 2: {//настройки
-			getSettingsMenu(colorX, colorO);
+			getSettingsMenu(colorX, colorO, fieldSizeInput, firstInput);
 			short menuSettings;
 			cin >> menuSettings;
 			switch (menuSettings) {
@@ -405,7 +421,7 @@ int main() {
 					cin >> colorChoiceX;
 					colorX = getColor(colorChoiceX);
 					cout << "Выбран " << colorChoiceX << " пункт\n";
-					getReturningMessage();
+					showReturningToMenuMessage();
 					break;
 				}
 				case 2: { //цвет нолика
@@ -414,16 +430,38 @@ int main() {
 					cin >> colorChoiceO;
 					colorO = getColor(colorChoiceO);
 					cout << "Выбран " << colorChoiceO << " пункт\n";
-					getReturningMessage();
+					showReturningToMenuMessage();
 					break;
 				}
 				default:
 					getErrorMessage();
 					break;
 				}
+				cin >> _;
 				break;
 			}
 			case 2: // кто первый ходит
+				clearConsole();
+				cout << "Кто первый ходит\n";
+				cout << "1. Крестик \x1b[" << colorX << "mX\x1b[0m\n"; //\x1b[" << colorX << "mX\x1b[0m:\n
+				cout << "2. Нолик \x1b[" << colorO << "mO\x1b[0m\n";
+				cin >> firstInput;
+				switch (firstInput) {
+				case 1:
+					cout << "\nВыбран \"\x1b[" << colorX << "mX\x1b[0m\"\n";
+					firstInput = 2;
+					showReturningToMenuMessage();
+					break;
+				case 2:
+					cout << "\nВыбран \"\x1b[" << colorO << "mO\x1b[0m\"\n";
+					firstInput = 1;
+					showReturningToMenuMessage();
+					break;
+				default:
+					getErrorMessage();
+					break;
+				}
+				cin >> _;
 				//в разработке
 				break;
 			case 3: // размер поля
@@ -434,12 +472,13 @@ int main() {
 				case 2:
 				case 3:
 					cout << "Выбран " << fieldSizeInput << " пункт\n";
-					getReturningMessage();
+					showReturningToMenuMessage();
 					break;
 				default:
 					getErrorMessage();
 					break;
 				}
+				cin >> _;
 				break;
 			default:
 				getErrorMessage();
