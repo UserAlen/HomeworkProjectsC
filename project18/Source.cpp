@@ -1102,7 +1102,7 @@ int main() {
 					break;
 				}
 				case 2: { //цвет нолика
-					getXColorMenu(colorX);
+					getOColorMenu(colorO);
 					short colorChoiceO;
 					cin >> colorChoiceO;
 					colorO = getColor(colorChoiceO);
