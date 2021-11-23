@@ -11,7 +11,6 @@ struct Question {
 };
 const short SIZE_QUESTIONS = 15;
 Question question[SIZE_QUESTIONS];
-
 void pauseSystem() {
 	system("pause");
 }
@@ -20,6 +19,7 @@ void clearSystem() {
 }
 void getErrorMessage() {
 	cout << "\n\n [Ошибка] Что-то пошло не так. . .\n\n";
+	cout << "Если кроме ошибки ничего не происходит, то введено значение, превышающее максимальное или минимальное хранимое значение, и единственный выход - ALT+F4\n\n";
 	pauseSystem();
 }
 short checkAnswer(short userAnswer, short questionNumber) {
@@ -34,7 +34,7 @@ short checkAnswer(short userAnswer, short questionNumber) {
 }
 
 //void showStructQuestion(Question question[], const short SIZE_QUESTIONS) {
-short showStructQuestion(short settingsHearts, short settingsQuestions) {
+short showStructQuestion(short settingsHearts, short settingsQuestions, short settingsTip) {
 	short answerChecks = 0;
 	short userAnswer[SIZE_QUESTIONS]{};
 	for (int i = 0; i < SIZE_QUESTIONS; i++) {
@@ -111,42 +111,125 @@ void showRules() {
 	cout << "Во время викторины пользователь может:\n";
 	cout << "1. Ответить на вопрос, выбрав один вариант из предложенных\n";
 	cout << "2. Убрать 2 неправильных варианта ответа, если в настройках включен пункт \"Подсказка\"";
-	cout << "Викторина заканчивается и выводятся окончательные результаты, если у пользователя:\n";
-	cout << "1. Кончились жизни\n";
-	cout << "2. Закончилось время\n\n";
+	cout << "Викторина заканчивается и выводятся окончательные результаты, если пользователь:\n";
+	cout << "1. Имеет 0 жизней\n";
+	cout << "2. Ответил на все вопросы\n\n";
+	pauseSystem();
 }
-void showSettings() {
-	clearSystem();
-	cout << "1. Сложность\n";
-	cout << "2. Таймер\n";
-	cout << "3. Жизни\n";
-	cout << "4. Подсказка\n";
-	short settingsChoice;
-	cin >> settingsChoice;
-	switch (settingsChoice) {
-	case 1: // сложность
-		break;
-	case 2: // таймер
-		break;
-	case 3: // жизни
-		break;
-	case 4: // подсказка
-		break;
-	default: //ошибка
-		getErrorMessage();
-		break;
+short showSettingsDifficulty() {
+	while (true) {
+		clearSystem();
+		cout << "Сложность.\n\n";
+		cout << "Количество вопросов:\n";
+		cout << "1. 5\n";
+		cout << "2. 10\n";
+		cout << "3. 15\n";
+		short settingsChoice;
+		cin >> settingsChoice;
+		switch (settingsChoice) {
+		case 1: // 5
+			pauseSystem();
+			return 5;
+		case 2: // 10
+			pauseSystem();
+			return 10;
+		case 3: // 15
+			pauseSystem();
+			return 15;
+		default: //ошибка
+			getErrorMessage();
+			break;
+		}
 	}
 }
-void getQuiz(short settingsHearts, short settingsQuestions) {
+short showSettingsHearts() {
+	while (true) {
+		clearSystem();
+		cout << "Жизни.\n\n";
+		cout << "Количество жизней от 1 до 5:\n";
+		short settingsChoice;
+		cin >> settingsChoice;
+		switch (settingsChoice) {
+		case 1:
+		case 2:
+		case 3: 
+		case 4:
+		case 5:
+			pauseSystem();
+			return settingsChoice - 1;
+		default: //ошибка
+			getErrorMessage();
+			break;
+		}
+	}
+}
+short showTip() {
+	while (true) {
+		clearSystem();
+		cout << "Подсказка.\n\n";
+		cout << "1. Включить\n";
+		cout << "2. Выключить\n";
+		short settingsChoice;
+		cin >> settingsChoice;
+		switch (settingsChoice) {
+		case 1: 
+		case 2:
+			return -settingsChoice;
+		default: //ошибка
+			getErrorMessage();
+			break;
+		}
+	}
+}
+short showSettings(short difficulty, short hearts, short tip) {
+	while (true) {
+		clearSystem();
+		cout << "Настройки\n\n";
+		cout << "1. Сложность [" << difficulty << " вопросов]\n";
+		cout << "2. Жизни [" << hearts << " жизней]\n";
+		cout << "3. Подсказка";
+		if (tip == 0) {
+			cout << " [Выключена]";
+		}
+		else {
+			cout << " [Включена]";
+		}
+		cout << "\n";
+		cout << "4. Выход из настроек\n";
+		short settingsChoice;
+		cin >> settingsChoice;
+		switch (settingsChoice) {
+		case 1: // сложность
+			return showSettingsDifficulty();
+		case 2: // жизни
+			return showSettingsHearts();
+		case 3: // подсказка
+			return showTip();
+		case 4:
+			return -9;
+		default: //ошибка
+			getErrorMessage();
+			break;
+		}
+	}
+}
+void getQuiz(short settingsHearts, short settingsQuestions, short settingsTip) {
 	fillStructQuestion();
-	short wrongAnswers = showStructQuestion(settingsHearts, settingsQuestions);
+	short wrongAnswers = showStructQuestion(settingsHearts, settingsQuestions, settingsTip);
 	clearSystem();
 	cout << "Результат: " << settingsQuestions - wrongAnswers << " правильных ответов из " << settingsQuestions << ".\n\n";
 	pauseSystem();
 }
 short showMainMenu() {
+	short settingsDifficulty = 5; // по умолчанию 5 вопросов
+	short settingsHearts = 5; // по умолчанию 5 жизней
+	short settingsTip = 0; // по умолчанию подсказка выключена (0)
+
+	//добавить число неправильных и число правильных и в процентах - рейтинг
+	//рейтинг обнуляется при выходе
 	while (true) {
 		clearSystem();
+		cout << "Главное меню\n\n";
 		cout << "1. Запустить викторину\n";
 		cout << "2. Настройки\n";
 		cout << "3. Правила\n";
@@ -155,12 +238,40 @@ short showMainMenu() {
 		cin >> userChoice;
 		switch (userChoice) {
 		case 1: //викторина
-			getQuiz(2, 5);
+			getQuiz(settingsHearts, settingsDifficulty, settingsTip);
 			break;
 		case 2: //настройки
-			showSettings();
-			break;
+			{
+				short settings = showSettings(settingsDifficulty, settingsHearts, settingsTip);
+				switch (settings) {
+				case -2:
+					settingsTip = 0;
+					break;
+				case -1:
+					settingsTip = 1;
+					break;
+				case -9:
+					break;
+				case 0:
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+					settingsHearts = settings + 1;
+					break;
+				case 5:
+				case 10:
+				case 15:
+					settingsDifficulty = settings;
+					break;
+				default:
+					getErrorMessage();
+					break;
+				}
+				break;
+			}
 		case 3: // правила
+			showRules();
 			break;
 		case 4: // выход
 			return 0;
@@ -185,17 +296,5 @@ int main() {
 	showStructQuestion(question[15], 15);*/
 
 
-	short hearts = 5; // по умолчанию 5 попыток
-	short timer = 5; // по умолчанию викторина длится 5 минут 
-
-	short question = 0;
-	//fillStructQuestion();
-	//showStructQuestion();
-
-	if (showMainMenu() == 0) {
-		return 0;
-	}
-
-	short _; cin >> _;
-	return 0;
+	return showMainMenu();
 }
