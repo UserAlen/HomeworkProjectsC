@@ -1,6 +1,6 @@
 #include <iostream>
 #include <windows.h> //для подключения функции Sleep
-#include <ctime> //для подключения функции time
+#include <ctime> //для подключения функции time, чтобы обнулять рандом
 
 using namespace std;
 
@@ -19,7 +19,8 @@ void clearSystem() {
 }
 void getErrorMessage() {
 	cout << "\n\n [Ошибка] Что-то пошло не так. . .\n\n";
-	cout << "Если кроме ошибки ничего не происходит, то введено значение, превышающее максимальное или минимальное хранимое значение, и единственный выход - ALT+F4\n\n";
+	cout << "Если ошибка зависла, то введено значение, превышающее максимальное или минимальное хранимое, ";
+	cout << "и единственный выход - ALT + F4\n\n";
 	pauseSystem();
 }
 short checkAnswer(short userAnswer, short questionNumber) {
@@ -32,40 +33,115 @@ short checkAnswer(short userAnswer, short questionNumber) {
 		return 1;
 	}
 }
+void showTipQuestion(short questionNumber) {
+	short correctAnswerNumber = 0;
+	short randomAnswerNumber = rand() % 4;
+	for (int i = 0; i < 4; i++) {
+		if (question[questionNumber].answer[i] == question[questionNumber].correctAnswer) {
+			correctAnswerNumber = i;
+			break;
+		}
+	}
+	while (randomAnswerNumber == correctAnswerNumber) {
+		randomAnswerNumber = rand() % 4;
+	}
+	if (correctAnswerNumber < randomAnswerNumber) {
+		cout << correctAnswerNumber + 1 << ". " << question[questionNumber].correctAnswer << endl;
+		cout << randomAnswerNumber + 1 << ". " << question[questionNumber].answer[randomAnswerNumber];
+	}
+	else {
+		cout << randomAnswerNumber + 1 << ". " << question[questionNumber].answer[randomAnswerNumber] << endl;
+		cout << correctAnswerNumber + 1 << ". " << question[questionNumber].correctAnswer;
+	}
+}
 
-//void showStructQuestion(Question question[], const short SIZE_QUESTIONS) {
 short showStructQuestion(short settingsHearts, short settingsQuestions, short settingsTip) {
 	short answerChecks = 0;
-	short userAnswer[SIZE_QUESTIONS]{};
+	short userAnswer = 0;
+	short hearts = settingsHearts;
+	bool answerIsNotOkay = true; //Флаг для задержки вопроса, 
+	//если его нужно просмотреть повторно в программе.
+	//Например, если пользователь ввел некорректное значение,
+	//из цикла с нужным вопросом программа не выйдет,
+	//пока пользователь не введет нужное значение 
+	//(правильное или неправильное, 
+	//но которое есть в проверках (в данной функции это case)
+	//и ни в какой default не заходит)
 	for (int i = 0; i < SIZE_QUESTIONS; i++) {
-		clearSystem();
-		cout << i + 1 << ". " << question[i].question << endl;
-		for (int j = 0; j < 4; j++) {
-			cout << j + 1 << ". " << question[i].answer[j] << endl;
+		while (answerIsNotOkay) {
+			clearSystem();
+			cout << "Всего вопросов: " << settingsQuestions << "\tЖизней: " << hearts << "\n\n";
+			cout << "Вопрос №" << i + 1 << ". " << question[i].question << endl << endl;
+			for (int j = 0; j < 4; j++) {
+				cout << j + 1 << ". " << question[i].answer[j] << endl;
+			}
+			if (settingsTip == 1) {
+				cout << "5. Подсказка\n";
+			}
+			if (settingsTip == 1 && userAnswer == 5) {
+				cout << "\n[Подсказка]\n";
+				showTipQuestion(i);
+				cout << endl;
+			}
+			cout << endl;
+			cout << "Введите номер ответа: ";
+			cin >> userAnswer;
+			switch (userAnswer) {
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+				answerChecks += checkAnswer(userAnswer, i);
+				if (answerChecks == settingsHearts) {
+					pauseSystem();
+					return i + 1 - answerChecks;//возвращает кол-во правильных ответов
+					//вычетом неправильных ответов от текущего номера вопроса,
+					//если количество жизней равно нулю.
+				}
+				else if (i + 1 == settingsQuestions) {
+					pauseSystem();
+					return settingsQuestions - answerChecks; //возвращает кол-во правильных ответов,
+					//если пользователь достиг последнего вопроса и ответил на него.
+				}
+				else {
+					hearts = settingsHearts - answerChecks;
+				}
+				answerIsNotOkay = false;//означает то, что можно перейти к следующему вопросу
+				pauseSystem();
+				break;
+			case 5:
+				if (settingsTip == 0) {
+					cout << "\nВы не включили подсказку в настройках!\n";
+					pauseSystem();
+				}
+				break;
+			default:
+				getErrorMessage();
+				break;
+			}
 		}
-		cout << endl;
-		cin >> userAnswer[i];
-		answerChecks += checkAnswer(userAnswer[i], i);
-		if (answerChecks == settingsHearts || i + 1 == settingsQuestions) {
-			return answerChecks;
-		}
-		pauseSystem();
+		answerIsNotOkay = true;
 	}
 	return answerChecks;
 }
 
-//Question 
-void fillStructQuestion() {
+void fillStructQuestion() {//функция для заполнения структуры через заполненный массив
+
+	//изначально программа писалась через массивы,
+	//поэтому, чтобы заново не переписывать,
+	//функция заполняет структуру значениями массива
+
 	const short SIZE_ANSWERS = 6; // всего 4 варианта ответа. 
 	//+2 для вопроса и верного варианта ответа, 
 	// т.е questions[y][0] - выдает сам вопрос, 
 	//questions[y][1-4] - выдает варианты ответов,
 	//questions[y][5] - выдает правильный ответ,
-	//где y - число от 0 до 14, которое означает номер вопроса (вопросов всего SIZE_QUESTIONS = 15)
+	//где y - число от 0 до 14, которое означает номер вопроса 
+	//(вопросов всего SIZE_QUESTIONS = 15 (инициализировано глобально))
 
 	string questions[SIZE_QUESTIONS][SIZE_ANSWERS]{
-		{"Тип данных программирования.",
-		"числовой", "символьный", "логический", "все перечисленные", "все перечисленные"},
+		{"Размер типа данных short",
+		"1", "2", "4", "8", "2"},
 		{"Тип данных, описывающий вещественные числа двоичной точности.",
 		"double", "float", "long", "char", "double"},
 		{"Максимальное хранимое число в типе данных int.",
@@ -103,17 +179,23 @@ void fillStructQuestion() {
 			question[y].answer[x] = questions[y][x + 1];
 		}
 	}
-	//return question[SIZE_QUESTIONS];
 }
 void showRules() {
 	clearSystem();
-	cout << "Правила.\n";
-	cout << "Во время викторины пользователь может:\n";
+	cout << "====Правила.\n\n";
+	cout << "==Во время викторины пользователь может:\n";
 	cout << "1. Ответить на вопрос, выбрав один вариант из предложенных\n";
-	cout << "2. Убрать 2 неправильных варианта ответа, если в настройках включен пункт \"Подсказка\"";
-	cout << "Викторина заканчивается и выводятся окончательные результаты, если пользователь:\n";
+	cout << "2. Убрать 2 неправильных варианта ответа из 4, если в настройках включен пункт \"Подсказка\"";
+	cout << "\n\n==Викторина заканчивается и выводятся окончательные результаты, если пользователь:\n";
 	cout << "1. Имеет 0 жизней\n";
 	cout << "2. Ответил на все вопросы\n\n";
+	cout << "==Система монет:\n\n";//еще не реализовано
+	cout << "1. За каждый правильный ответ начисляется 1 монета\n";
+	cout << "2. За каждый неправильный ответ вычитываются 2 монеты\n";
+	cout << "3. Количество монет не может быть меньше 0\n";
+	cout << "4. Если у пользователя 0 монет, то ";
+	cout << "за каждый неправильный ответ ничего не начисляется и не вычитается\n\n";
+	cout << "\n(Если пользователь ввел некорректное значение, то выведется сообщение об этом)\n\n";
 	pauseSystem();
 }
 short showSettingsDifficulty() {
@@ -128,12 +210,15 @@ short showSettingsDifficulty() {
 		cin >> settingsChoice;
 		switch (settingsChoice) {
 		case 1: // 5
+		case 5:
 			pauseSystem();
 			return 5;
 		case 2: // 10
+		case 10:
 			pauseSystem();
 			return 10;
 		case 3: // 15
+		case 15:
 			pauseSystem();
 			return 15;
 		default: //ошибка
@@ -152,7 +237,7 @@ short showSettingsHearts() {
 		switch (settingsChoice) {
 		case 1:
 		case 2:
-		case 3: 
+		case 3:
 		case 4:
 		case 5:
 			pauseSystem();
@@ -172,7 +257,7 @@ short showTip() {
 		short settingsChoice;
 		cin >> settingsChoice;
 		switch (settingsChoice) {
-		case 1: 
+		case 1:
 		case 2:
 			return -settingsChoice;
 		default: //ошибка
@@ -195,7 +280,7 @@ short showSettings(short difficulty, short hearts, short tip) {
 			cout << " [Включена]";
 		}
 		cout << "\n";
-		cout << "4. Выход из настроек\n";
+		cout << "4. В меню\n";
 		short settingsChoice;
 		cin >> settingsChoice;
 		switch (settingsChoice) {
@@ -205,7 +290,7 @@ short showSettings(short difficulty, short hearts, short tip) {
 			return showSettingsHearts();
 		case 3: // подсказка
 			return showTip();
-		case 4:
+		case 4: //выход из настроек
 			return -9;
 		default: //ошибка
 			getErrorMessage();
@@ -213,11 +298,63 @@ short showSettings(short difficulty, short hearts, short tip) {
 		}
 	}
 }
+void getRandomAnswersInQuestion(short questionNumber) {
+	string randomAnswers[4]{}; //для хранения уже зарандомленных ответов
+	short randomNum = rand() % 4;
+	string tempAnswer;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			while (randomAnswers[i] == question[questionNumber].answer[randomNum]) {
+				randomNum = rand() % 4;
+			}
+		}
+		tempAnswer = question[questionNumber].answer[i];
+		question[questionNumber].answer[i] = question[questionNumber].answer[randomNum];
+		question[questionNumber].answer[randomNum] = tempAnswer;
+	}
+}
+void getRandomQuestions() {
+	string randomQuestions[SIZE_QUESTIONS]{};//для хранения уже зарандомленных вопросов
+	short randomNum = rand() % SIZE_QUESTIONS;
+	string temp;//для хранения временных данных, 
+	//которые могут стереться, но их нужно присвоить
+	for (int i = 0; i < SIZE_QUESTIONS; i++) {
+		for (int j = 0; j < SIZE_QUESTIONS; j++) {
+			while (randomQuestions[i] == question[randomNum].question) {
+				randomNum = rand() & SIZE_QUESTIONS;
+			}
+		}
+		randomQuestions[i] = question[i].question;
+		question[i].question = question[randomNum].question;
+		question[randomNum].question = randomQuestions[i];
+		for (int k = 0; k < 4; k++) {
+			temp = question[i].answer[k];
+			question[i].answer[k] = question[randomNum].answer[k];
+			question[randomNum].answer[k] = temp;
+		}
+		temp = question[i].correctAnswer;
+		question[i].correctAnswer = question[randomNum].correctAnswer;
+		question[randomNum].correctAnswer = temp;
+		getRandomAnswersInQuestion(randomNum);//функция с рандомом ответов
+		getRandomAnswersInQuestion(i);
+	}
+}
 void getQuiz(short settingsHearts, short settingsQuestions, short settingsTip) {
-	fillStructQuestion();
-	short wrongAnswers = showStructQuestion(settingsHearts, settingsQuestions, settingsTip);
+	fillStructQuestion();//функция заполнения структуры вопросами
+	getRandomQuestions();//функция с рандомом вопросов
+	short correctAnswers = showStructQuestion(settingsHearts, settingsQuestions, settingsTip);
 	clearSystem();
-	cout << "Результат: " << settingsQuestions - wrongAnswers << " правильных ответов из " << settingsQuestions << ".\n\n";
+	cout << "Результат: " << correctAnswers << " ";
+	if (correctAnswers == 1) {
+		cout << "правильный ответ";
+	}
+	else if (correctAnswers > 1 && correctAnswers < 5) {
+		cout << "правильных ответа";
+	}
+	else if (correctAnswers >= 5 || correctAnswers == 0) {
+		cout << "правильных ответов";
+	}
+	cout << " из " << settingsQuestions << ".\n\n";
 	pauseSystem();
 }
 short showMainMenu() {
@@ -241,41 +378,45 @@ short showMainMenu() {
 			getQuiz(settingsHearts, settingsDifficulty, settingsTip);
 			break;
 		case 2: //настройки
-			{
-				short settings = showSettings(settingsDifficulty, settingsHearts, settingsTip);
-				switch (settings) {
-				case -2:
-					settingsTip = 0;
-					break;
-				case -1:
-					settingsTip = 1;
-					break;
-				case -9:
-					break;
-				case 0:
-				case 1:
-				case 2:
-				case 3:
-				case 4:
-					settingsHearts = settings + 1;
-					break;
-				case 5:
-				case 10:
-				case 15:
-					settingsDifficulty = settings;
-					break;
-				default:
-					getErrorMessage();
-					break;
-				}
+		{
+			short settings = showSettings(settingsDifficulty, settingsHearts, settingsTip);
+			switch (settings) {
+			case -2: //подсказка выключена 
+				//(значения подсказки в отрицательном виде, 
+				//чтобы с другими значениями не конфликтовало)
+				settingsTip = 0;
+				break;
+			case -1: //подсказка включена
+				settingsTip = 1;
+				break;
+			case -9: //выход из настроек 
+				//(значение ничего не делает, но помогает выйти из меню настроек;
+				//присутствует в кейсе, чтобы программа не зашла в default
+				//и не вывелось сообщение с ошибкой)
+				break;
+			case 0: //количество жизней
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+				settingsHearts = settings + 1;
+				break;
+			case 5://сложность (количество вопросов)
+			case 10:
+			case 15:
+				settingsDifficulty = settings;
+				break;
+			default://ошибка
+				getErrorMessage();
 				break;
 			}
+			break;
+		}
 		case 3: // правила
 			showRules();
 			break;
 		case 4: // выход
 			return 0;
-			break;
 		default:
 			getErrorMessage();
 			break;
@@ -288,13 +429,11 @@ int main() {
 	// 4 варианта ответа
 	// вопросы и ответы рандомно выбираются при каждом запуске программы
 	// подсказка 50 на 50 - 2 неверных варианта удаляются, остаются верный и неверный варианты
-	// таймер - пользователь вводит любое число, которое определяет минуты на таймере
-	// попытки от 1 до 5
+	// попытки (в данной программе - жизни) от 1 до 5
 
 
-	/*Question question[15] = fillStructQuestion(); //не работает, поэтому инициализирую глобально
-	showStructQuestion(question[15], 15);*/
+	/*Question question[15] = fillStructQuestion(); //не работает, поэтому инициализирую глобально*/
 
-
+	srand(time(NULL)); //Обнуление рандома при каждом запуске программы (чтобы не было каждый раз одинакового рандома)
 	return showMainMenu();
 }
