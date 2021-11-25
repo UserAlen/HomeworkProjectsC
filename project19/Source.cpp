@@ -149,7 +149,7 @@ void fillStructQuestion() {//функция для заполнения стру
 		{"Максимальное хранимое число в типе данных short.",
 		"2 147 483 647", "2 147 483 648", "32 768", "32 767", "32 767"},
 		{"string userName;\nСтиль написания данной переменной.",
-		"PascalCase", "CamelCase", "KebabCase", "SnakeCase", "CamelCase"},
+		"Pascal Case", "Camel Case", "Kebab Case", "Snake Case", "Camel Case"},
 		{"int a{5};\nСпособ инициализации данной переменной.",
 		"Копирующая инициализация", "Прямая инициализация", "Uniform-инициализация",
 		"Инициализирующая инициализация", "Uniform-инициализация"},
@@ -320,7 +320,7 @@ void getRandomQuestions() {
 	//которые могут стереться, но их нужно присвоить
 	for (int i = 0; i < SIZE_QUESTIONS; i++) {
 		for (int j = 0; j < SIZE_QUESTIONS; j++) {
-			while (randomQuestions[i] == question[randomNum].question) {
+			while (randomQuestions[j] == question[randomNum].question) {
 				randomNum = rand() & SIZE_QUESTIONS;
 			}
 		}
