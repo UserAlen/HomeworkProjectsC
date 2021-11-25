@@ -1,7 +1,11 @@
 ﻿#include <iostream>
 using namespace std;
-int sum(int num1, int num2, char operation) {
-	if (operation == '/' && num2 == 0) return -1;
+
+int doMath(int num1, int num2, char operation) {
+	if (operation == '/' && num2 == 0) {
+		cout << "\nДелить на ноль нельзя!\n";
+		return 0;
+	}
 
 	switch (operation) {
 	case '+': return num1 + num2;
@@ -36,10 +40,11 @@ int sum(int num1, int num2, char operation) {
 			return num1;
 		}
 	}
-	default: return 0;
+	default: 
+		cout << "\n{ОШИБКА}\n";
+		return 0;
 	}
 }
-
 int main() {
 	setlocale(0, "");
 
@@ -64,11 +69,11 @@ int main() {
 	char operation;
 	cin >> operation;
 
-	int result = sum(num1, num2, operation);
+	int result = doMath(num1, num2, operation);
 
 	cout << "[+] Результат: " << result << endl;
 
-	cout << endl << "Для выхода нажмите любую клавишу. . .";
+	cout << endl << "Для выхода из программы введите любое число. . .\n";
 	int _; cin >> _;
 	return 0;
 }
