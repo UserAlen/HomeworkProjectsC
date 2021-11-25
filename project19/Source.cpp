@@ -1,5 +1,4 @@
 #include <iostream>
-#include <windows.h> //для подключения функции Sleep
 #include <ctime> //для подключения функции time, чтобы обнулять рандом
 
 using namespace std;
@@ -54,9 +53,27 @@ void showTipQuestion(short questionNumber) {
 		cout << correctAnswerNumber + 1 << ". " << question[questionNumber].correctAnswer;
 	}
 }
+void getQuizResults(short correctAnswers, short settingsQuestions) {
+	clearSystem();
+	cout << "Результат: " << correctAnswers << " ";
+	if (correctAnswers == 1) {
+		cout << "правильный ответ";
+	}
+	else if (correctAnswers > 1 && correctAnswers < 5) {
+		cout << "правильных ответа";
+	}
+	else if (correctAnswers >= 5 || correctAnswers == 0) {
+		cout << "правильных ответов";
+	}
+	cout << " из " << settingsQuestions << ".\n\n";
+}
+short showStructQuestion(short settingsHearts, short settingsQuestions, short settingsTip, short colorQuestion, short colorAnswer) {
+	short coins = 0;
+	short tipForCoins = 0;
 
-short showStructQuestion(short settingsHearts, short settingsQuestions, short settingsTip) {
-	short answerChecks = 0;
+	short answerCheck = 0; //для хранения правильного или неправильного ответа (используется для проверки начисления монет)
+
+	short answerChecks = 0; //для хранения неправльных ответов
 	short userAnswer = 0;
 	short hearts = settingsHearts;
 	bool answerIsNotOkay = true; //Флаг для задержки вопроса, 
@@ -70,10 +87,10 @@ short showStructQuestion(short settingsHearts, short settingsQuestions, short se
 	for (int i = 0; i < SIZE_QUESTIONS; i++) {
 		while (answerIsNotOkay) {
 			clearSystem();
-			cout << "Всего вопросов: " << settingsQuestions << "\tЖизней: " << hearts << "\n\n";
-			cout << "Вопрос №" << i + 1 << ". " << question[i].question << endl << endl;
+			cout << "Всего вопросов: " << settingsQuestions << "\tЖизней: " << hearts << "\tМонет: " << coins << "\n\n";
+			cout << "\x1b[" << colorQuestion << "mВопрос №" << i + 1 << ". " << question[i].question << "\x1b[0m\n\n";
 			for (int j = 0; j < 4; j++) {
-				cout << j + 1 << ". " << question[i].answer[j] << endl;
+				cout << "\x1b[" << colorAnswer << "m" << j + 1 << ". " << question[i].answer[j] << "\x1b[0m\n";
 			}
 			if (settingsTip == 1) {
 				cout << "5. Подсказка\n";
@@ -81,6 +98,7 @@ short showStructQuestion(short settingsHearts, short settingsQuestions, short se
 			if (settingsTip == 1 && userAnswer == 5) {
 				cout << "\n[Подсказка]\n";
 				showTipQuestion(i);
+				tipForCoins = 1;
 				cout << endl;
 			}
 			cout << endl;
@@ -91,17 +109,42 @@ short showStructQuestion(short settingsHearts, short settingsQuestions, short se
 			case 2:
 			case 3:
 			case 4:
-				answerChecks += checkAnswer(userAnswer, i);
+				answerCheck = checkAnswer(userAnswer, i);
+				if (answerCheck == 0) {
+					coins++;
+					tipForCoins = 0;
+					cout << "Вы заработали 1 монету!\n\n";
+				}
+				else if (tipForCoins == 1) {
+					coins -= 2;
+					if (coins <= 0) {
+						coins = 0;
+						cout << "У вас 0 монет!\n\n";
+					}
+					else {
+						cout << "Вы потеряли 2 монеты!!!\n\n";
+					}
+				}
+				else {
+					coins--;
+					if (coins < 0) {
+						coins = 0;
+					}
+					cout << "Вы потеряли 1 монету!!\n\n";
+				}
+				answerChecks += answerCheck;
 				if (answerChecks == settingsHearts) {
 					pauseSystem();
-					return i + 1 - answerChecks;//возвращает кол-во правильных ответов
+					getQuizResults(i + 1 - answerChecks, settingsQuestions);//передает кол-во правильных ответов
 					//вычетом неправильных ответов от текущего номера вопроса,
-					//если количество жизней равно нулю.
+					//если количество жизней равно нулю, и кол-во вопросов
+					return coins;
 				}
 				else if (i + 1 == settingsQuestions) {
 					pauseSystem();
-					return settingsQuestions - answerChecks; //возвращает кол-во правильных ответов,
-					//если пользователь достиг последнего вопроса и ответил на него.
+					getQuizResults(settingsQuestions - answerChecks, settingsQuestions);//передает кол-во правильных ответов,
+					//если пользователь достиг последнего вопроса и ответил на него, и кол-во вопросов
+					return coins;
 				}
 				else {
 					hearts = settingsHearts - answerChecks;
@@ -122,7 +165,7 @@ short showStructQuestion(short settingsHearts, short settingsQuestions, short se
 		}
 		answerIsNotOkay = true;
 	}
-	return answerChecks;
+	return coins;
 }
 
 void fillStructQuestion() {//функция для заполнения структуры через заполненный массив
@@ -189,12 +232,13 @@ void showRules() {
 	cout << "\n\n==Викторина заканчивается и выводятся окончательные результаты, если пользователь:\n";
 	cout << "1. Имеет 0 жизней\n";
 	cout << "2. Ответил на все вопросы\n\n";
-	cout << "==Система монет:\n\n";//еще не реализовано
-	cout << "1. За каждый правильный ответ начисляется 1 монета\n";
-	cout << "2. За каждый неправильный ответ вычитываются 2 монеты\n";
-	cout << "3. Количество монет не может быть меньше 0\n";
-	cout << "4. Если у пользователя 0 монет, то ";
-	cout << "за каждый неправильный ответ ничего не начисляется и не вычитается\n\n";
+	cout << "==Система наград:\n\n";
+	cout << "1. В викторине свой счетчик монет\n";
+	cout << "2. За каждый правильный ответ начисляется 1 монета\n";
+	cout << "3. За каждый неправильный ответ вычитывается 1 монета\n";
+	cout << "4. За каждый неправильный ответ с используемой подсказкой вычитываются 2 монеты\n";
+	cout << "5. Количество монет не может быть меньше 0\n";
+	cout << "6. Пользователь может кастомизировать данное приложение за монеты в магазине\n\n";
 	cout << "\n(Если пользователь ввел некорректное значение, то выведется сообщение об этом)\n\n";
 	pauseSystem();
 }
@@ -316,8 +360,7 @@ void getRandomAnswersInQuestion(short questionNumber) {
 void getRandomQuestions() {
 	string randomQuestions[SIZE_QUESTIONS]{};//для хранения уже зарандомленных вопросов
 	short randomNum = rand() % SIZE_QUESTIONS;
-	string temp;//для хранения временных данных, 
-	//которые могут стереться, но их нужно присвоить
+	string temp;//для хранения временных данных, которые могут стереться, но их нужно присвоить
 	for (int i = 0; i < SIZE_QUESTIONS; i++) {
 		for (int j = 0; j < SIZE_QUESTIONS; j++) {
 			while (randomQuestions[j] == question[randomNum].question) {
@@ -339,43 +382,160 @@ void getRandomQuestions() {
 		getRandomAnswersInQuestion(i);
 	}
 }
-void getQuiz(short settingsHearts, short settingsQuestions, short settingsTip) {
+int getQuiz(short settingsHearts, short settingsQuestions, short settingsTip, short colorQuestion, short colorAnswer) {
 	fillStructQuestion();//функция заполнения структуры вопросами
 	getRandomQuestions();//функция с рандомом вопросов
-	short correctAnswers = showStructQuestion(settingsHearts, settingsQuestions, settingsTip);
+	short coins = showStructQuestion(settingsHearts, settingsQuestions, settingsTip, colorQuestion, colorAnswer);
+	cout << "Вы заработали " << coins << " ";
+	if (coins == 1) {
+		cout << "монету";
+	}
+	else if (coins > 1 && coins < 5) {
+		cout << "монеты";
+	}
+	else if (coins >= 5 || coins == 0) {
+		cout << "монет";
+	}
+	cout << ".\n\n";
+	pauseSystem();
+	return coins;
+}
+void showCoins(int coins) {
+	cout << "У вас есть " << coins << " ";
+	if (coins == 1) {
+		cout << "монета";
+	}
+	else if (coins > 1 && coins < 5) {
+		cout << "монеты";
+	}
+	else if (coins >= 5 || coins == 0) {
+		cout << "монет";
+	}
+	cout << "\n\n";
+}
+short showColorQuestion() {
+	while (true) {
+		clearSystem();
+		cout << "Цвета вопросов за 2 монеты:\n\n";
+		for (short i = 0; i < 6; i++) {
+			cout << i + 1 << ". \x1b[" << i + 31 << "mВопрос №" << i + 1 << ". Текст вопроса\x1b[0m\n";
+		}
+		for (short i = 7; i < 14; i++) {
+			cout << i << ". \x1b[" << i + 84 << "mВопрос №" << i << ". Текст вопроса\x1b[0m\n";
+		}
+		short colorQuestion;
+		cin >> colorQuestion;
+		switch (colorQuestion) {
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+			pauseSystem();
+			return colorQuestion + 30;
+		case 7:
+		case 8:
+		case 9:
+		case 10:
+		case 11:
+		case 12:
+		case 13:
+			pauseSystem();
+			return colorQuestion + 84;
+		default:
+			getErrorMessage();
+			break;
+		}
+	}
+}
+short showColorAnswer() {
+	while (true) {
+		clearSystem();
+		cout << "Цвета ответов за 2 монеты:\n\n";
+		for (short i = 0; i < 6; i++) {
+			cout << "\x1b[" << i + 31 << "m" << i + 1 << ". Ответ\x1b[0m\n";
+		}
+		for (short i = 7; i < 14; i++) {
+			cout << "\x1b[" << i + 84 << "m" << i << ". Ответ\x1b[0m\n";
+		}
+		short colorAnswer;
+		cin >> colorAnswer;
+		switch (colorAnswer) {
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+			pauseSystem();
+			return colorAnswer + 30;
+		case 7:
+		case 8:
+		case 9:
+		case 10:
+		case 11:
+		case 12:
+		case 13:
+			pauseSystem();
+			return colorAnswer + 84;
+		default:
+			getErrorMessage();
+			break;
+		}
+	}
+	return 0;
+}
+short showShop(int coins) {
 	clearSystem();
-	cout << "Результат: " << correctAnswers << " ";
-	if (correctAnswers == 1) {
-		cout << "правильный ответ";
+	cout << "Магазин\n\n";
+	showCoins(coins);
+	if (coins < 2) {
+		cout << "Возвращайтесь позже\n";
 	}
-	else if (correctAnswers > 1 && correctAnswers < 5) {
-		cout << "правильных ответа";
+	else {
+		cout << "1. Цвета вопросов\n";
+		cout << "2. Цвета ответов\n\n";
+		short shop;
+		cin >> shop;
+		cout << endl;
+		switch (shop) {
+		case 1:
+			return showColorQuestion();
+			break;
+		case 2:
+			return showColorAnswer() - 100;
+			break;
+		default:
+			getErrorMessage();
+			break;
+		}
 	}
-	else if (correctAnswers >= 5 || correctAnswers == 0) {
-		cout << "правильных ответов";
-	}
-	cout << " из " << settingsQuestions << ".\n\n";
 	pauseSystem();
 }
 short showMainMenu() {
+	int coins = 0;
+	short colorQuestion = 0;
+	short colorAnswer = 0;
+
+	short shop = 0;
+
 	short settingsDifficulty = 5; // по умолчанию 5 вопросов
 	short settingsHearts = 5; // по умолчанию 5 жизней
-	short settingsTip = 0; // по умолчанию подсказка выключена (0)
-
-	//добавить число неправильных и число правильных и в процентах - рейтинг
-	//рейтинг обнуляется при выходе
+	short settingsTip = 0; // по умолчанию подсказка выключена
 	while (true) {
 		clearSystem();
 		cout << "Главное меню\n\n";
 		cout << "1. Запустить викторину\n";
 		cout << "2. Настройки\n";
 		cout << "3. Правила\n";
-		cout << "4. Выход\n";
+		cout << "4. Магазин\n";
+		cout << "5. Выход\n";
 		short userChoice;
 		cin >> userChoice;
 		switch (userChoice) {
 		case 1: //викторина
-			getQuiz(settingsHearts, settingsDifficulty, settingsTip);
+			coins += getQuiz(settingsHearts, settingsDifficulty, settingsTip, colorQuestion, colorAnswer);
 			break;
 		case 2: //настройки
 		{
@@ -415,7 +575,19 @@ short showMainMenu() {
 		case 3: // правила
 			showRules();
 			break;
-		case 4: // выход
+		case 4:
+			shop = showShop(coins);
+			if (shop < 0) {
+				colorAnswer = shop + 100;
+			}
+			else {
+				colorQuestion = shop;
+			}
+			if (coins >= 2) {
+				coins -= 2;
+			}
+			break;
+		case 5: // выход
 			return 0;
 		default:
 			getErrorMessage();
@@ -430,9 +602,6 @@ int main() {
 	// вопросы и ответы рандомно выбираются при каждом запуске программы
 	// подсказка 50 на 50 - 2 неверных варианта удаляются, остаются верный и неверный варианты
 	// попытки (в данной программе - жизни) от 1 до 5
-
-
-	/*Question question[15] = fillStructQuestion(); //не работает, поэтому инициализирую глобально*/
 
 	srand(time(NULL)); //Обнуление рандома при каждом запуске программы (чтобы не было каждый раз одинакового рандома)
 	return showMainMenu();
