@@ -102,8 +102,9 @@ short showStructQuestion(short settingsHearts, short settingsQuestions, short se
 				cout << endl;
 			}
 			cout << endl;
-			cout << "Введите номер ответа: ";
+			cout << "\x1b[" << colorAnswer << "mВведите номер ответа: ";
 			cin >> userAnswer;
+			cout << "\x1b[0m";
 			switch (userAnswer) {
 			case 1:
 			case 2:
@@ -423,6 +424,8 @@ short showColorQuestion() {
 		for (short i = 7; i < 14; i++) {
 			cout << i << ". \x1b[" << i + 84 << "mВопрос №" << i << ". Текст вопроса\x1b[0m\n";
 		}
+		cout << "14. Вопрос №14. Текст вопроса\n";
+		cout << "15. Выход\n";
 		short colorQuestion;
 		cin >> colorQuestion;
 		switch (colorQuestion) {
@@ -443,6 +446,12 @@ short showColorQuestion() {
 		case 13:
 			pauseSystem();
 			return colorQuestion + 84;
+		case 14:
+			pauseSystem();
+			return 0;
+		case 15:
+			pauseSystem();
+			return 200;
 		default:
 			getErrorMessage();
 			break;
@@ -459,6 +468,8 @@ short showColorAnswer() {
 		for (short i = 7; i < 14; i++) {
 			cout << "\x1b[" << i + 84 << "m" << i << ". Ответ\x1b[0m\n";
 		}
+		cout << "14. Ответ\n";
+		cout << "15. Выход\n";
 		short colorAnswer;
 		cin >> colorAnswer;
 		switch (colorAnswer) {
@@ -479,6 +490,11 @@ short showColorAnswer() {
 		case 13:
 			pauseSystem();
 			return colorAnswer + 84;
+		case 14:
+			pauseSystem();
+			return 0;
+		case 15:
+			return 300;
 		default:
 			getErrorMessage();
 			break;
@@ -487,31 +503,36 @@ short showColorAnswer() {
 	return 0;
 }
 short showShop(int coins) {
-	clearSystem();
-	cout << "Магазин\n\n";
-	showCoins(coins);
-	if (coins < 2) {
-		cout << "Возвращайтесь позже\n";
-	}
-	else {
-		cout << "1. Цвета вопросов\n";
-		cout << "2. Цвета ответов\n\n";
-		short shop;
-		cin >> shop;
-		cout << endl;
-		switch (shop) {
-		case 1:
-			return showColorQuestion();
-			break;
-		case 2:
-			return showColorAnswer() - 100;
-			break;
-		default:
-			getErrorMessage();
-			break;
+	while (true) {
+		clearSystem();
+		cout << "Магазин\n\n";
+		showCoins(coins);
+		if (coins < 2) {
+			cout << "Возвращайтесь позже\n";
+			pauseSystem();
+			return 200;
+		}
+		else {
+			cout << "1. Цвета вопросов\n";
+			cout << "2. Цвета ответов\n";
+			cout << "3. В меню\n\n";
+			short shop;
+			cin >> shop;
+			cout << endl;
+			switch (shop) {
+			case 1:
+				return showColorQuestion();
+			case 2:
+				return showColorAnswer() - 100;
+			case 3:
+				return 200;
+			default:
+				getErrorMessage();
+				break;
+			}
+			pauseSystem();
 		}
 	}
-	pauseSystem();
 }
 short showMainMenu() {
 	int coins = 0;
@@ -530,7 +551,7 @@ short showMainMenu() {
 		cout << "2. Настройки\n";
 		cout << "3. Правила\n";
 		cout << "4. Магазин\n";
-		cout << "5. Выход\n";
+		cout << "5. Выход\n\n";
 		short userChoice;
 		cin >> userChoice;
 		switch (userChoice) {
@@ -577,13 +598,13 @@ short showMainMenu() {
 			break;
 		case 4:
 			shop = showShop(coins);
-			if (shop < 0) {
+			if (shop < 0 && shop != 200) {
 				colorAnswer = shop + 100;
 			}
-			else {
+			else if (shop != 200) {
 				colorQuestion = shop;
 			}
-			if (coins >= 2) {
+			if (coins >= 2 && shop != 200) {
 				coins -= 2;
 			}
 			break;
